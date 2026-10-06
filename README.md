@@ -6,7 +6,13 @@
 [![Tests Passing](https://img.shields.io/badge/tests-29%20passed-brightgreen.svg)]()
 [![Forensic Standards](https://img.shields.io/badge/standards-ISO%2FIEC%2027037%20%7C%20NIST%20SP%20800--86-cyan.svg)]()
 [![Integrity](https://img.shields.io/badge/RFC%203161-TSA%20Validated-emerald.svg)]()
-[![Container](https://img.shields.io/badge/.wasp%20Bundle-HMAC--SHA256%20Signed-gold.svg)]()
+[![Live Web Console Demo](https://img.shields.io/badge/Live%20Demo-Tactical%20DFIR%20Console-blueviolet?style=for-the-badge&logo=googlechrome)](https://shreeya239.github.io/WASP/)
+
+---
+
+> [!TIP]
+> **🚀 Live Interactive Web Console**: Experience the WASP Tactical DFIR Console directly in your browser with zero installation:  
+> 👉 **[https://shreeya239.github.io/WASP/](https://shreeya239.github.io/WASP/)**
 
 ---
 
