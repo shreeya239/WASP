@@ -1,24 +1,47 @@
 [
   {
-    "anomaly_id": "BURST-1990256",
+    "anomaly_id": "BURST-1900137",
     "anomaly_type": "BURST_ACTIVITY",
-    "severity": "MEDIUM",
+    "severity": "HIGH",
+    "title": "Activity Volume Spike (8 events in 15m)",
+    "description": "Robust statistical burst detected (Modified Z-score 8.77 via Median Absolute Deviation). Event count (8) significantly exceeds baseline median (1.5, MAD-scale 0.7).",
+    "window_start_utc": "2024-03-11T02:15:00+00:00",
+    "window_end_utc": "2024-03-11T02:30:00+00:00",
+    "metric_value": 8.0,
+    "baseline_value": 3.5,
+    "z_score": 8.77,
+    "affected_users": [
+      "admin",
+      "UNKNOWN"
+    ],
+    "sample_events": [
+      "9f93c3ea-851e-5310-ac07-e2ac799f95fc",
+      "1e9877e9-498b-5129-a8cd-e34ee883bfdc",
+      "f6d2f55f-221d-5d40-885c-755ec9c66285",
+      "6ded5620-e31b-5773-96b0-7d218247de02",
+      "387d751a-3abe-54b2-9bc7-7f4bd9d8a2f9"
+    ]
+  },
+  {
+    "anomaly_id": "BURST-1990504",
+    "anomaly_type": "BURST_ACTIVITY",
+    "severity": "HIGH",
     "title": "Activity Volume Spike (12 events in 15m)",
-    "description": "Statistical burst detected with Z-score 2.18. Event count (12) is significantly higher than baseline mean (3.5 +/- 3.9).",
-    "window_start_utc": "2026-10-05T20:00:00+00:00",
-    "window_end_utc": "2026-10-05T20:15:00+00:00",
+    "description": "Robust statistical burst detected (Modified Z-score 14.16 via Median Absolute Deviation). Event count (12) significantly exceeds baseline median (1.5, MAD-scale 0.7).",
+    "window_start_utc": "2026-10-08T10:00:00+00:00",
+    "window_end_utc": "2026-10-08T10:15:00+00:00",
     "metric_value": 12.0,
     "baseline_value": 3.5,
-    "z_score": 2.18,
+    "z_score": 14.16,
     "affected_users": [
       "UNKNOWN"
     ],
     "sample_events": [
-      "20d655a7-c173-5434-a810-9ec27ffc9ac5",
-      "bfd12651-f154-5463-a5b1-3d615d2bbf82",
-      "ce212f37-4e2c-5513-a760-c589ab0ac8be",
-      "1b269f3d-b192-5721-b86f-399ccf5bc418",
-      "af65ea35-9668-5acd-86bf-1ed01ccb0b13"
+      "3e98dc96-54c5-5bba-8877-91717f2c0181",
+      "b3149f3f-e557-5ac0-832e-ac4963357f2b",
+      "7e9b4da4-6a23-5ecc-ba78-d2f928c7bee7",
+      "57b60d51-94b5-5fc6-9ace-54f9daa34e05",
+      "810a270a-7db5-5daa-ad73-1d21a4d9d304"
     ]
   },
   {

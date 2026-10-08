@@ -8,6 +8,10 @@
     "timestamp_utc": "2024-03-11T02:15:00+00:00",
     "event_id": "9f93c3ea-851e-5310-ac07-e2ac799f95fc",
     "parent_name": null,
+    "session_id": null,
+    "logon_id": null,
+    "is_orphan": false,
+    "orphan_reason": null,
     "threat_alerts": [],
     "children": []
   },
@@ -20,6 +24,10 @@
     "timestamp_utc": "2024-03-11T02:16:00+00:00",
     "event_id": "f6d2f55f-221d-5d40-885c-755ec9c66285",
     "parent_name": null,
+    "session_id": null,
+    "logon_id": null,
+    "is_orphan": false,
+    "orphan_reason": null,
     "threat_alerts": [],
     "children": []
   },
@@ -32,6 +40,10 @@
     "timestamp_utc": "2024-03-11T02:16:15+00:00",
     "event_id": "6ded5620-e31b-5773-96b0-7d218247de02",
     "parent_name": null,
+    "session_id": null,
+    "logon_id": null,
+    "is_orphan": false,
+    "orphan_reason": null,
     "threat_alerts": [],
     "children": []
   },
@@ -44,6 +56,10 @@
     "timestamp_utc": "2024-03-11T02:17:00+00:00",
     "event_id": "387d751a-3abe-54b2-9bc7-7f4bd9d8a2f9",
     "parent_name": null,
+    "session_id": null,
+    "logon_id": null,
+    "is_orphan": false,
+    "orphan_reason": null,
     "threat_alerts": [],
     "children": []
   }

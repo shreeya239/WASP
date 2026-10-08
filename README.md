@@ -59,7 +59,7 @@ graph TD
 
         TIMELINE --> CORROB[Cross-Source Corroborator & Timestomp Detector]
         TIMELINE --> LINEAGE[Process Lineage Attack Tree Reconstructor]
-        TIMELINE --> ANOMALY[Statistical Anomaly Spotlight & AI Burst Detector]
+        TIMELINE --> ANOMALY[Statistical Anomaly Spotlight & Robust MAD Outlier Detector]
         TIMELINE --> SIGMA[Native Sigma Detection Engine]
     end
 
@@ -132,9 +132,9 @@ sequenceDiagram
 
 ---
 
-### 2. ⚡ Statistical & Off-Hours Anomaly Spotlight (AI Burst Detection)
-* **What it does**: Computes rolling $Z$-scores and activity baseline metrics over the timeline to automatically detect:
-  * **Activity Bursts ($Z \ge 2.0\sigma$)**: Identifies anomalous event volume spikes in configurable sliding windows (15m/60m).
+### 2. ⚡ Statistical & Off-Hours Anomaly Spotlight (Deterministic Robust Statistics)
+* **What it does**: Computes non-parametric robust statistics (**Median Absolute Deviation / MAD**) and activity baseline metrics over the timeline with **zero AI/LLM black-boxes**:
+  * **Activity Bursts ($Z_{\text{MAD}} \ge 2.0$)**: Identifies anomalous event volume spikes in configurable sliding windows (15m/60m) using mathematically reproducible Median Absolute Deviation.
   * **Off-Hours Privileged Logons**: Flags administrative or root logins occurring outside operational hours (e.g., 22:00–06:00 UTC or weekend access).
   * **Rapid Mass File Alterations**: Detects high-velocity mass file encryption, deletion, or renaming loops characteristic of ransomware execution ($\ge 10$ files modified in $\le 60\text{s}$).
 
