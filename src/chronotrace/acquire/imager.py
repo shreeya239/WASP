@@ -108,10 +108,14 @@ class Imager:
         self,
         source_dir: str | Path,
         archive_name: str = "evidence_archive.tar",
+        output_filename: Optional[str] = None,
         evidence_id: str = "EV-0001",
         notes: str = "",
     ) -> Dict[str, Any]:
         """Archive a directory into a tarball inside the evidence folder with streaming SHA-256."""
+        if output_filename:
+            archive_name = output_filename
+
         src = Path(source_dir).resolve()
         if not src.is_dir():
             raise NotADirectoryError(f"Source is not a directory: {source_dir}")

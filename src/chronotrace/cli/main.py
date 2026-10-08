@@ -51,8 +51,8 @@ def main_callback(
 @case_app.command("create")
 def case_create(
     id: str = typer.Option(..., "--id", help="Case identifier (e.g. CASE-2024-0117)"),
-    out: Path = typer.Option(..., "--out", help="Output directory path for the case"),
-    examiner: str = typer.Option("Forensic Analyst", "--examiner", help="Lead forensic examiner name"),
+    out: Path = typer.Option(..., "--out", "--output", help="Output directory path for the case"),
+    examiner: str = typer.Option("Forensic Analyst", "--examiner", "--investigator", help="Lead forensic examiner name"),
     organization: str = typer.Option("DFIR Unit", "--organization", help="Investigating organization"),
     authorization_ref: str = typer.Option("AUTH-001", "--authorization-ref", help="Warrant or authorization reference"),
     description: str = typer.Option("Digital Forensics Investigation", "--description", help="Case description"),
