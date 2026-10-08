@@ -229,32 +229,53 @@ class SigmaRuleEngine:
 
             val_in_event = search_map.get(field_name, search_map.get("any_field", ""))
 
+            import base64
+
+            def _test_match(target_val: str, search_term: str, modifier_type: str) -> bool:
+                if modifier_type == "contains":
+                    return search_term in target_val
+                elif modifier_type == "startswith":
+                    return target_val.startswith(search_term)
+                elif modifier_type == "endswith":
+                    return target_val.endswith(search_term)
+                elif modifier_type == "re":
+                    try:
+                        return bool(re.search(search_term, target_val, re.IGNORECASE))
+                    except re.error:
+                        return False
+                elif modifier_type == "base64":
+                    try:
+                        b64_term = base64.b64encode(search_term.encode("utf-8")).decode("utf-8").lower()
+                        return b64_term in target_val
+                    except Exception:
+                        return False
+                return target_val == search_term
+
             if isinstance(criteria, list):
-                # Any match in list
-                matched = False
-                for term in criteria:
-                    term_str = str(term).lower()
-                    if mod == "contains" and term_str in val_in_event:
-                        matched = True
-                        matched_fields[field_spec] = term_str
-                        break
-                    elif mod == "exact" and term_str == val_in_event:
-                        matched = True
-                        matched_fields[field_spec] = term_str
-                        break
-                    elif mod == "endswith" and val_in_event.endswith(term_str):
-                        matched = True
-                        matched_fields[field_spec] = term_str
-                        break
-                if not matched:
-                    return None
+                if "all" in modifier:
+                    # All items must match
+                    all_matched = True
+                    for term in criteria:
+                        if not _test_match(val_in_event, str(term).lower(), mod):
+                            all_matched = False
+                            break
+                    if not all_matched:
+                        return None
+                    matched_fields[field_spec] = criteria
+                else:
+                    # Any match in list
+                    matched = False
+                    for term in criteria:
+                        term_str = str(term).lower()
+                        if _test_match(val_in_event, term_str, mod):
+                            matched = True
+                            matched_fields[field_spec] = term_str
+                            break
+                    if not matched:
+                        return None
             else:
                 criteria_str = str(criteria).lower()
-                if mod == "contains" and criteria_str in val_in_event:
-                    matched_fields[field_spec] = criteria_str
-                elif mod == "exact" and criteria_str == val_in_event:
-                    matched_fields[field_spec] = criteria_str
-                elif mod == "endswith" and val_in_event.endswith(criteria_str):
+                if _test_match(val_in_event, criteria_str, mod):
                     matched_fields[field_spec] = criteria_str
                 else:
                     return None

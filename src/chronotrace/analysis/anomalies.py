@@ -113,17 +113,34 @@ class AnomalyDetector:
         else:
             counts = [len(evs) for evs in windows.values()]
 
+        # Robust Statistics: Median and Median Absolute Deviation (MAD)
+        sorted_counts = sorted(counts)
+        n = len(sorted_counts)
+        median = sorted_counts[n // 2] if n % 2 != 0 else (sorted_counts[n // 2 - 1] + sorted_counts[n // 2]) / 2.0
+
+        # Compute MAD: median(|x_i - median|)
+        abs_deviations = sorted([abs(c - median) for c in counts])
+        mad = abs_deviations[n // 2] if n % 2 != 0 else (abs_deviations[n // 2 - 1] + abs_deviations[n // 2]) / 2.0
+        # Normal consistency constant: 1.4826 * MAD approximates std dev for normal distributions
+        mad_scale = 1.4826 * mad
+
+        # Classical statistics
         mean = sum(counts) / len(counts)
         variance = sum((c - mean) ** 2 for c in counts) / len(counts)
         std_dev = math.sqrt(variance)
 
-        if std_dev == 0:
+        if mad_scale == 0 and std_dev == 0:
             return []
 
         findings: List[AnomalyFinding] = []
         for bucket, evs in sorted(windows.items()):
             count = len(evs)
-            z = (count - mean) / std_dev
+            # Use robust modified Z-score based on MAD if available, fallback to classical
+            if mad_scale > 0:
+                z = (count - median) / mad_scale
+            else:
+                z = (count - mean) / std_dev if std_dev > 0 else 0.0
+
             if z >= self.z_threshold:
                 start_dt = datetime.datetime.fromtimestamp(bucket * window_sec, tz=datetime.timezone.utc)
                 end_dt = datetime.datetime.fromtimestamp((bucket + 1) * window_sec, tz=datetime.timezone.utc)
@@ -136,8 +153,8 @@ class AnomalyDetector:
                         severity="HIGH" if z > 3.0 else "MEDIUM",
                         title=f"Activity Volume Spike ({count} events in {self.window_minutes}m)",
                         description=(
-                            f"Statistical burst detected with Z-score {z:.2f}. Event count ({count}) "
-                            f"is significantly higher than baseline mean ({mean:.1f} +/- {std_dev:.1f})."
+                            f"Robust statistical burst detected (Modified Z-score {z:.2f} via Median Absolute Deviation). "
+                            f"Event count ({count}) significantly exceeds baseline median ({median:.1f}, MAD-scale {mad_scale:.1f})."
                         ),
                         window_start_utc=start_dt.isoformat(),
                         window_end_utc=end_dt.isoformat(),

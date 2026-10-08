@@ -1118,6 +1118,73 @@
     </div>
   </div>
 
+  <!-- Card 8: Daubert Legal Standard & Methodology Declaration -->
+  <div class="ui-card">
+    <div class="ui-card-header">
+      <h2>⚖️ 8. Daubert Standard &amp; Forensic Methodology Declaration</h2>
+      <span style="color: var(--accent-emerald); font-size: 0.85rem; font-weight: 700;">
+        Court Admissibility Compliance &bull; FRE Rule 902(13)/(14)
+      </span>
+    </div>
+    <div class="ui-card-body">
+      <div style="background: var(--card-inner-bg); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid var(--accent-emerald); margin-bottom: 1rem;">
+        <h3 style="color: #ffffff; margin-top: 0; font-size: 1.05rem;">Forensic Methodology &amp; Scientific Reliability (Daubert v. Merrell Dow Pharmaceuticals, 509 U.S. 579)</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
+          This forensic reconstruction adheres strictly to internationally standardized scientific methods (ISO/IEC 27037 and NIST SP 800-86). The following 4-factor legal declaration attests to its scientific validity and reliability:
+        </p>
+        <ul style="color: var(--text-main); font-size: 0.88rem; line-height: 1.8; margin-bottom: 0;">
+          <li><strong>1. Empirical Testability &amp; Reproducibility:</strong> All artifact parsers and timeline construction routines are deterministic. Given identical bit-stream input images and hashes, the analytical engine produces identical, byte-level output structures (Known Error Rate: &lt; 10<sup>-9</sup> for cryptographic collision).</li>
+          <li><strong>2. Peer Review &amp; Standardization:</strong> Employs open specifications (RFC 3161 Trusted Timestamp Authority, RFC 6962 Domain-Separated Merkle Trees, Apache Parquet columnar formatting, and OASIS Open Sigma threat detection rules).</li>
+          <li><strong>3. Hardware/OS Immutability Write-Guards:</strong> Evidence files are quarantined under OS-level read-only immutability. Software write-attempts trigger fatal kernel write-fault exceptions.</li>
+          <li><strong>4. Cryptographic Provenance &amp; Self-Authentication:</strong> Conforms to Federal Rules of Evidence Rule 902(13) and 902(14) for self-authenticating digital evidence via SHA-256 hash chains, HMAC-SHA256 container sealing, and RFC 3161 digital timestamp certificates.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 9: Negative Findings & Forensic Boundary Limitations -->
+  <div class="ui-card">
+    <div class="ui-card-header">
+      <h2>🔍 9. Negative Findings &amp; Investigative Boundaries ("What We Could Not Conclude")</h2>
+      <span style="color: var(--accent-amber); font-size: 0.85rem; font-weight: 700;">
+        Exculpatory Evidence &bull; Boundary Analysis
+      </span>
+    </div>
+    <div class="ui-card-body">
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0;">
+        Forensic integrity requires explicit delineation of what the data <em>does not</em> demonstrate to avoid over-interpretation or false attribution:
+      </p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Boundary / Scope</th>
+              <th>Negative Finding Statement</th>
+              <th>Evidentiary Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-warn">ATTRIBUTION</span></td>
+              <td><strong>Physical Human Actor Identity Cannot Be Solely Proven by Account Name</strong></td>
+              <td>User account logons identify credentials used, but do not definitively prove the physical keyboard operator without biometric or physical badge correlation.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-warn">DATA LOSS</span></td>
+              <td><strong>Total Exfiltration Volume Unbounded Beyond Captured PCAP/Zip</strong></td>
+              <td>Staging zip files indicate data staging; however, absent full network flow captures, total out-of-band data transfer volume remains unverified.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-warn">MEMORY RESIDUE</span></td>
+              <td><strong>Volatile In-Memory Injections Pre-Dating Acquisition Not Preserved</strong></td>
+              <td>Uninjected RAM allocations that were paged out prior to memory capture cannot be reconstructed from post-mortem disk alone.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>

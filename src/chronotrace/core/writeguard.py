@@ -4,27 +4,88 @@ from __future__ import annotations
 import os
 import io
 from pathlib import Path
-from typing import Set
+from typing import Dict, Set
 from chronotrace.core.errors import EvidenceWriteAttempt
 
-# Registry of protected evidence paths
+import stat
+import platform
+
+# Registry of protected evidence paths with original permission mode
 _PROTECTED_EVIDENCE_PATHS: Set[str] = set()
+_ORIGINAL_FILE_MODES: Dict[str, int] = {}
 _ORIGINAL_OPEN = open
 _ORIGINAL_IO_OPEN = io.open
 _GUARD_INSTALLED = False
 
 
+def _set_os_immutable(target_path: Path) -> None:
+    """Set OS-level read-only immutability flags on files and folders."""
+    try:
+        if target_path.is_file():
+            current_mode = target_path.stat().st_mode
+            _ORIGINAL_FILE_MODES[str(target_path)] = current_mode
+            # Remove all write bits (S_IWUSR, S_IWGRP, S_IWOTH)
+            ro_mode = current_mode & ~stat.S_IWRITE & ~stat.S_IWGRP & ~stat.S_IWOTH
+            os.chmod(target_path, ro_mode)
+        elif target_path.is_dir():
+            for root, dirs, files in os.walk(target_path):
+                for f in files:
+                    fp = Path(root) / f
+                    try:
+                        cm = fp.stat().st_mode
+                        _ORIGINAL_FILE_MODES[str(fp)] = cm
+                        os.chmod(fp, cm & ~stat.S_IWRITE & ~stat.S_IWGRP & ~stat.S_IWOTH)
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
+
+def _restore_os_permissions(target_path: Path) -> None:
+    """Restore original file permissions when write-guard scope ends."""
+    try:
+        if target_path.is_file():
+            orig = _ORIGINAL_FILE_MODES.pop(str(target_path), None)
+            if orig is not None:
+                os.chmod(target_path, orig)
+            else:
+                os.chmod(target_path, stat.S_IREAD | stat.S_IWRITE)
+        elif target_path.is_dir():
+            for root, dirs, files in os.walk(target_path):
+                for f in files:
+                    fp = Path(root) / f
+                    orig = _ORIGINAL_FILE_MODES.pop(str(fp), None)
+                    if orig is not None:
+                        try:
+                            os.chmod(fp, orig)
+                        except Exception:
+                            pass
+                    else:
+                        try:
+                            os.chmod(fp, stat.S_IREAD | stat.S_IWRITE)
+                        except Exception:
+                            pass
+    except Exception:
+        pass
+
+
 def register_protected_path(path: str | Path) -> None:
-    """Register an evidence file or directory path as read-only protected."""
-    norm = str(Path(path).resolve())
+    """Register an evidence file or directory path as read-only protected and lock OS permissions."""
+    p = Path(path).resolve()
+    norm = str(p)
     _PROTECTED_EVIDENCE_PATHS.add(norm)
+    if p.exists():
+        _set_os_immutable(p)
     ensure_guard_installed()
 
 
 def unregister_protected_path(path: str | Path) -> None:
-    """Unregister a path from read-only protection."""
-    norm = str(Path(path).resolve())
+    """Unregister a path from read-only protection and unlock OS permissions."""
+    p = Path(path).resolve()
+    norm = str(p)
     _PROTECTED_EVIDENCE_PATHS.discard(norm)
+    if p.exists():
+        _restore_os_permissions(p)
 
 
 def is_path_protected(path: str | Path) -> bool:

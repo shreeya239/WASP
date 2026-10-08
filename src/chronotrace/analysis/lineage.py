@@ -39,6 +39,10 @@ class ProcessNode:
     timestamp_utc: str
     event_id: str
     parent_name: Optional[str] = None
+    session_id: Optional[str] = None
+    logon_id: Optional[str] = None
+    is_orphan: bool = False
+    orphan_reason: Optional[str] = None
     children: List["ProcessNode"] = field(default_factory=list)
     threat_alerts: List[str] = field(default_factory=list)
 
@@ -52,6 +56,10 @@ class ProcessNode:
             "timestamp_utc": self.timestamp_utc,
             "event_id": self.event_id,
             "parent_name": self.parent_name,
+            "session_id": self.session_id,
+            "logon_id": self.logon_id,
+            "is_orphan": self.is_orphan,
+            "orphan_reason": self.orphan_reason,
             "threat_alerts": self.threat_alerts,
             "children": [c.to_dict() for c in self.children],
         }
@@ -99,6 +107,8 @@ class ProcessLineageReconstructor:
             proc_name = proc_path.replace("\\", "/").split("/")[-1].split(" ")[0]
             cmd_line = raw.get("CommandLine") or ev.object.path or proc_name
             user = ev.user or raw.get("TargetUserName") or "UNKNOWN"
+            session_id = str(raw.get("SessionId") or raw.get("SecurityID") or "") or None
+            logon_id = str(raw.get("TargetLogonId") or raw.get("LogonId") or "") or None
 
             node = ProcessNode(
                 pid=pid,
@@ -108,6 +118,8 @@ class ProcessLineageReconstructor:
                 user=user,
                 timestamp_utc=ev.timestamp_utc,
                 event_id=ev.event_id,
+                session_id=session_id,
+                logon_id=logon_id,
             )
 
             # Node key based on pid and timestamp
@@ -141,6 +153,10 @@ class ProcessLineageReconstructor:
                         alert_msg = f"SUSPICIOUS_SPAWN: {desc} ({parent_match.process_name} -> {node.process_name})"
                         node.threat_alerts.append(alert_msg)
             else:
+                # Classify orphan process root
+                if node.ppid and node.ppid not in ("0", "4", "SYSTEM", "UNKNOWN"):
+                    node.is_orphan = True
+                    node.orphan_reason = f"Parent PPID {node.ppid} not found in log capture (pre-log execution, parent terminated, or cross-session WMI/RPC)"
                 roots.append(node)
 
         return roots

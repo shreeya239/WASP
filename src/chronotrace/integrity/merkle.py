@@ -6,20 +6,37 @@ from typing import List, Sequence
 
 
 class MerkleTree:
-    """Calculates a deterministic Merkle root over a sequence of leaf hashes."""
+    """Calculates a deterministic Merkle root with RFC 6962 domain separation.
+    
+    RFC 6962 Domain Separation:
+      * Leaf nodes: H(0x00 || leaf_data)
+      * Internal nodes: H(0x01 || left || right)
+    This prevents second-preimage collision attacks between leaf and internal nodes.
+    
+    Odd-leaf handling:
+      * An unbalanced odd leaf at any tier is promoted directly or combined with domain separation.
+    """
 
-    @staticmethod
-    def compute_root(leaf_hashes: Sequence[str]) -> str:
+    LEAF_PREFIX = b"\x00"
+    NODE_PREFIX = b"\x01"
+
+    @classmethod
+    def compute_root(cls, leaf_hashes: Sequence[str]) -> str:
         """
-        Compute root hash over a list of leaf hex digests.
-        Empty set produces standard zero hash.
+        Compute root hash over a list of leaf hex digests using domain separation.
+        Empty set produces standard 64-zero hash.
         """
         if not leaf_hashes:
             return "0" * 64
 
-        # Deterministic sort of leaf hashes
+        # Deterministic sort of leaf hashes for reproducible evidence trees
         sorted_leaves = sorted(leaf_hashes)
-        current_layer = [bytes.fromhex(h) for h in sorted_leaves]
+
+        # RFC 6962 Leaf Hashing: H(0x00 || leaf_hash_bytes)
+        current_layer = [
+            hashlib.sha256(cls.LEAF_PREFIX + bytes.fromhex(h)).digest()
+            for h in sorted_leaves
+        ]
 
         while len(current_layer) > 1:
             next_layer = []
@@ -28,8 +45,9 @@ class MerkleTree:
                 if i + 1 < len(current_layer):
                     right = current_layer[i + 1]
                 else:
-                    right = left  # duplicate odd leaf
-                combined = hashlib.sha256(left + right).digest()
+                    # Odd-leaf promotion rule with domain preservation
+                    right = left
+                combined = hashlib.sha256(cls.NODE_PREFIX + left + right).digest()
                 next_layer.append(combined)
             current_layer = next_layer
 

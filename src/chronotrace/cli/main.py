@@ -106,15 +106,26 @@ def gui_cmd():
 
 
 @app.command("web")
-def web_cmd():
-    """Launch the WASP Tactical DFIR Web Application Console in browser."""
+def web_cmd(
+    case_dir: Optional[Path] = typer.Option(None, "--case", help="Path to case directory to serve via REST API"),
+    port: int = typer.Option(8080, "--port", "-p", help="Port for the API server"),
+    serve_api: bool = typer.Option(False, "--api", help="Start background REST API server"),
+):
+    """Launch the WASP Tactical DFIR Web Application Console and local REST API backend."""
     import webbrowser
     web_file = Path(__file__).resolve().parent.parent.parent.parent / "web" / "index.html"
     if not web_file.exists():
         console.print(f"[bold red]Web console not found at:[/bold red] {web_file}")
         raise typer.Exit(code=1)
-    console.print(f"[bold yellow]Launching WASP Tactical Web Console:[/bold yellow] [underline]{web_file.as_uri()}[/underline]")
-    webbrowser.open(web_file.as_uri())
+
+    if serve_api and case_dir:
+        from chronotrace.api.server import run_api_server
+        console.print(f"[bold green][+][/bold green] Starting WASP Forensic API Server on [cyan]http://127.0.0.1:{port}[/cyan]...")
+        webbrowser.open(web_file.as_uri())
+        run_api_server(case_dir, port=port)
+    else:
+        console.print(f"[bold yellow]Launching WASP Tactical Web Console:[/bold yellow] [underline]{web_file.as_uri()}[/underline]")
+        webbrowser.open(web_file.as_uri())
 
 
 # --- DEVICE COMMANDS ---

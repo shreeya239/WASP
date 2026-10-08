@@ -36,3 +36,20 @@ def test_writeguard_blocks_write_mode(tmp_path: Path):
 
     # Outside context, protection is unregistered
     assert not is_path_protected(evidence_file)
+
+
+def test_writeguard_os_level_immutability_blocks_os_write(tmp_path: Path):
+    """Negative control: Verify OS kernel rejects raw write open when guarded."""
+    evidence_file = tmp_path / "disk_os.raw"
+    evidence_file.write_bytes(b"ORIGINAL_EVIDENCE")
+
+    with WriteGuardContext(evidence_file):
+        # Raw built-in open (simulating C extension or external caller without guarded_open)
+        with pytest.raises(PermissionError):
+            with open(evidence_file, "wb") as f:
+                f.write(b"TAMPER_PAYLOAD")
+
+    # Outside context, permissions restored, write succeeds
+    with open(evidence_file, "ab") as f:
+        f.write(b"_APPENDED")
+    assert evidence_file.read_bytes() == b"ORIGINAL_EVIDENCE_APPENDED"
