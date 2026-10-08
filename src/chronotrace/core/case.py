@@ -121,7 +121,19 @@ class Case:
 
         self.ledger = CustodyLedger(self.ledger_path)
         self.manifest = CaseManifest(self.manifest_path, case_id=self.case_id)
+        
+        # Zero-Trust Policy: Immediate OS-level write-quarantine on evidence path
         register_protected_path(self.evidence_dir)
+
+        # Zero-Trust Policy: Verify custody ledger hash-chain integrity upon opening
+        if self.ledger_path.exists():
+            is_valid, count, errors = self.ledger.verify_ledger()
+            if not is_valid:
+                from chronotrace.core.errors import EvidenceCorruptError
+                raise EvidenceCorruptError(
+                    f"[ZERO-TRUST VIOLATION] Custody ledger tampering detected on case {self.case_id}: "
+                    f"{'; '.join(errors)}"
+                )
 
     @property
     def case_id(self) -> str:
