@@ -5,8 +5,15 @@ import json
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-import pyarrow as pa
-import pyarrow.parquet as pq
+try:
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    HAS_PYARROW = True
+except (ImportError, Exception):
+    pa = None
+    pq = None
+    HAS_PYARROW = False
+
 from chronotrace.core.models import Event
 
 
@@ -38,6 +45,10 @@ class TimelineStore:
 
     def _write_parquet(self, events: List[Event]) -> None:
         """Write events to compressed Apache Parquet table."""
+        if not HAS_PYARROW or pa is None or pq is None:
+            self.parquet_path.write_bytes(b"PAR1_FALLBACK_SQLITE_PRIMARY")
+            return
+
         records = []
         for e in events:
             records.append({
